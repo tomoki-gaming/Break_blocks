@@ -3,6 +3,11 @@ phina.globalize();
 //screen size
 let SCREEN_X = 640;
 let SCREEN_Y = 480;
+//start delay
+let DIREY = 120;
+//Block num
+let BLOCK_x_num = 5;
+let BLOCK_y_num = 4;
 //video img
 const player = document.getElementById('player');
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -39,8 +44,8 @@ phina.define("MainScene", {
         var block_group = DisplayElement().addChildTo(this);
         let span = [100,50];
         let interval =[110,35];
-        for (let j = 0; j < 4; j++) {
-            for (let i = 0;i < 5; i++) {
+        for (let j = 0; j < BLOCK_y_num; j++) {
+            for (let i = 0;i < BLOCK_x_num; i++) {
                 var block = Block('bar',100,20).addChildTo(block_group);
                 block.setPosition(i*interval[0]+span[0],j*interval[1]+span[1]);
                 block.setSize(block.x_size,block.y_size); 
@@ -81,6 +86,7 @@ phina.define('Bar', {
         this.superInit(image);
         this.x_size = x_size;
         this.y_size = y_size;
+        this.col_flag = 0;
     },
 });
 //ball class
@@ -90,15 +96,27 @@ phina.define('Ball', {
         this.superInit(image);
         this.spd = [5,5];
         this.size = size;
+        this.time_flag = 0;
     },
     collision:function(shape){
-        if (this.hitTestElement(shape)){
+        if (this.hitTestElement(shape) && shape.col_flag==0){
             this.spd[1]*=-1;
+            shape.col_flag = 30;
+        }
+        else if(shape.col_flag > 0){
+            shape.col_flag-=1;
         }
     },
     update: function() {
-        this.x += this.spd[0];
-        this.y += this.spd[1];
+        //delay to start
+        if(this.time_flag > DIREY){
+            this.x += this.spd[0];
+            this.y += this.spd[1];
+        }
+        else{
+            this.time_flag+=1;
+        }
+
         if (this.x >= SCREEN_X -this.size/2 || this.x <= 0){
             this.spd[0] *= -1;
         }
