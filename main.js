@@ -8,6 +8,9 @@ let DIREY = 120;
 //Block num
 let BLOCK_x_num = 5;
 let BLOCK_y_num = 4;
+
+let block_remove_num = 0;
+
 //video img
 const player = document.getElementById('player');
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -60,6 +63,10 @@ phina.define("MainScene", {
         var bar = Bar('bar',100,20).addChildTo(this).setPosition(320,400);
         bar.setSize(bar.x_size,bar.y_size);
         this.bar = bar;
+        //success
+        var label = Label({text:'',fill:"red"}).addChildTo(this);
+        label.setPosition(SCREEN_X/2, SCREEN_Y/2);
+        this.label = label;
     },
     update: function(app){
         var bar = this.bar
@@ -69,12 +76,17 @@ phina.define("MainScene", {
         this.block_collision(ball);
         this.elem.canvas.context.drawImage(player, 0, 0, SCREEN_X ,SCREEN_Y);
         detectFace(bar);
+        if (block_remove_num >= BLOCK_x_num*BLOCK_y_num){
+            this.label.text = 'SUCCESS';
+        }
     },
     block_collision:function(ball){
         this.block_group.children.each(function(block){
             if (ball.hitTestElement(block)){
                 ball.spd[1] *= -1;
                 block.remove();
+                //(仮)
+                block_remove_num += 1;
             }
         });
     }
