@@ -44,51 +44,49 @@ phina.define("MainScene", {
         this.elem.setPosition(SCREEN_X/2, SCREEN_Y/2);
         this.elem.canvas.translate( 640, 0 ).scale( -1, 1 );
         //blocks
-        var block_group = DisplayElement().addChildTo(this);
+        this.block_group = DisplayElement().addChildTo(this);
         let span = [100,50];
         let interval =[110,35];
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
-                var block = Block('bar',100,20).addChildTo(block_group);
+                var block = Block('bar',100,20).addChildTo(this.block_group);
                 block.setPosition(i*interval[0]+span[0],j*interval[1]+span[1]);
                 block.setSize(block.x_size,block.y_size); 
             }
         }
-        this.block_group = block_group;
         //ball
-        var ball = Ball('ball',32).addChildTo(this).setPosition(320,200);
-        ball.setSize(ball.size , ball.size);
-        this.ball = ball;
+        this.ball = Ball('ball',32).addChildTo(this).setPosition(320,200);
+        this.ball.setSize(this.ball.size, this.ball.size);
         //bar(player)
-        var bar = Bar('bar',100,20).addChildTo(this).setPosition(320,400);
-        bar.setSize(bar.x_size,bar.y_size);
-        this.bar = bar;
+        this.bar = Bar('bar',100,20).addChildTo(this).setPosition(320,400);
+        this.bar.setSize(this.bar.x_size, this.bar.y_size);
         //success
-        var label = Label({text:'',fill:"red"}).addChildTo(this);
-        label.setPosition(SCREEN_X/2, SCREEN_Y/2);
-        this.label = label;
+        this.label = Label({text:'',fill:"red"}).addChildTo(this);
+        this.label.setPosition(SCREEN_X/2, SCREEN_Y/2);
     },
-    update: function(app){
-        var bar = this.bar
-        var ball = this.ball
-        // bar.x = app.pointer.x;
-        ball.collision(bar);
-        this.block_collision(ball);
+    update: function(){
+        this.ball.collision(this.bar);
+        this.block_collision(this.ball);
         this.elem.canvas.context.drawImage(player, 0, 0, SCREEN_X ,SCREEN_Y);
-        detectFace(bar);
-        if (block_remove_num >= BLOCK_x_num*BLOCK_y_num){
-            this.label.text = 'SUCCESS';
-        }
+        detectFace(this.bar);
+        this.success_or_failure();
     },
     block_collision:function(ball){
         this.block_group.children.each(function(block){
             if (ball.hitTestElement(block)){
                 ball.spd[1] *= -1;
                 block.remove();
-                //(仮)
-                block_remove_num += 1;
+                block_remove_num += 1;//
             }
         });
+    },
+    success_or_failure:function(){
+        if (block_remove_num >= BLOCK_x_num*BLOCK_y_num){
+            this.label.text = 'SUCCESS';
+        }
+        else if(this.ball.y > SCREEN_Y-this.ball.size){
+            this.label.text = 'FAILURE';
+        }
     }
 });
 //bar(player) class
