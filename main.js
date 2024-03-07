@@ -9,8 +9,6 @@ let DIREY = 120;
 let BLOCK_x_num = 5;
 let BLOCK_y_num = 4;
 
-let block_remove_num = 0;
-
 //video img
 const player = document.getElementById('player');
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -33,6 +31,19 @@ var ASSETS = {
       'bar' :'./Image/bar.png',
     },
   };
+//some scene
+var myScenes = [
+    {
+      label: 'Main',
+      className: 'MainScene',
+      nextLabel: '',
+    },
+    {
+      label: 'Title',
+      className: 'TitleScene',
+      nextLabel: '',
+    },
+];
 //Display class
 phina.define("MainScene", {
     superClass: 'DisplayScene',
@@ -63,29 +74,42 @@ phina.define("MainScene", {
         //success
         this.label = Label({text:'',fill:"red"}).addChildTo(this);
         this.label.setPosition(SCREEN_X/2, SCREEN_Y/2);
+        //success(1) or failure(~-1) or playing(0)
+        this.success_count = 0;
     },
     update: function(){
         this.ball.collision(this.bar);
-        this.block_collision(this.ball);
+        lest_num = this.block_collision(this.ball);
         this.elem.canvas.context.drawImage(player, 0, 0, SCREEN_X ,SCREEN_Y);
         detectFace(this.bar);
-        this.success_or_failure();
+        this.success_or_failure(lest_num);
     },
     block_collision:function(ball){
+        var lest_num = 0;
         this.block_group.children.each(function(block){
-            if (ball.hitTestElement(block)){
-                ball.spd[1] *= -1;
-                block.remove();
-                block_remove_num += 1;//
-            }
+            if(block){
+                lest_num += 1;
+                if (ball.hitTestElement(block)){
+                    ball.spd[1] *= -1;
+                    block.remove();
+                }
+            }   
         });
+        return lest_num;
     },
-    success_or_failure:function(){
-        if (block_remove_num >= BLOCK_x_num*BLOCK_y_num){
+    success_or_failure:function(lest_num){
+        if(this.success_count < 0){
+            this.success_count -= 1;
+            if(this.success_count <= -DIREY){
+                this.exit({nextLabel: 'main'});
+            }
+        }
+        else if (lest_num == 0 ){
             this.label.text = 'SUCCESS';
         }
         else if(this.ball.y > SCREEN_Y-this.ball.size){
             this.label.text = 'FAILURE';
+            this.success_count = -1;
         }
     }
 });
