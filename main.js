@@ -28,7 +28,8 @@ async function detectFace(bar){
 var ASSETS = {
     image: {
       'ball': './Image/ball.png',
-      'bar' :'./Image/bar.png',
+      'bar' : './Image/bar.png',
+      'bar2': './Image/bar2.png',
     },
   };
 //some scene
@@ -60,15 +61,19 @@ phina.define("MainScene", {
         let interval =[110,35];
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
-                var block = Block('bar',100,20).addChildTo(this.block_group);
+                var block_shade = Block('bar2',100,100,i).addChildTo(this.block_group);
+                block_shade.setPosition(i*interval[0]+span[0]+5,j*interval[1]+span[1]+5);
+                block_shade.setSize(block_shade.x_size,block_shade.y_size);
+
+                var block = Block('bar',100,20 ,i).addChildTo(this.block_group);
                 block.setPosition(i*interval[0]+span[0],j*interval[1]+span[1]);
-                block.setSize(block.x_size,block.y_size); 
+                block.setSize(block.x_size,block.y_size);
             }
         }
         //ball
         this.ball = Ball('ball',32).addChildTo(this).setPosition(320,200);
         this.ball.setSize(this.ball.size, this.ball.size);
-        //bar(player)
+        //bar
         this.bar = Bar('bar',100,20).addChildTo(this).setPosition(320,400);
         this.bar.setSize(this.bar.x_size, this.bar.y_size);
         //success
@@ -85,17 +90,14 @@ phina.define("MainScene", {
         this.success_or_failure(lest_num);
     },
     block_collision:function(ball){
-        var lest_num = 0;
-        this.block_group.children.each(function(block){
-            if(block){
-                lest_num += 1;
-                if (ball.hitTestElement(block)){
-                    ball.spd[1] *= -1;
-                    block.remove();
-                }
-            }   
-        });
-        return lest_num;
+        for(let i=0 ;i<this.block_group.children.length;i+=2){
+            if (ball.hitTestElement(this.block_group.children[i+1])){
+                ball.spd[1] *= -1;
+                this.block_group.children[i].remove();
+                this.block_group.children[i].remove();
+            }
+        }
+        return this.block_group.children.length/2;
     },
     success_or_failure:function(lest_num){
         if(this.success_count < 0){
@@ -113,7 +115,7 @@ phina.define("MainScene", {
         }
     }
 });
-//bar(player) class
+//bar class
 phina.define('Bar', {
     superClass: 'Sprite',
     init: function(image ,x_size,y_size) {
@@ -162,10 +164,11 @@ phina.define('Ball', {
 //block class
 phina.define('Block', {
     superClass: 'Sprite',
-    init: function(image ,x_size,y_size) {
+    init: function(image ,x_size,y_size,i) {
         this.superInit(image);
         this.x_size = x_size;
         this.y_size = y_size;
+        this.index = i;
     },
 });
 //main function
