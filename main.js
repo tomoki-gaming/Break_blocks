@@ -23,6 +23,7 @@ async function detectFace(bar){
     const result = await faceapi.detectSingleFace(player,options);
     if(!result) return;
     bar.x = SCREEN_X-(result._box._x + result._box._width/2);
+    bar.y = result._box._y + result._box._height/4
 }
 //img asset
 var ASSETS = {
