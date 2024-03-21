@@ -6,8 +6,8 @@ let SCREEN_Y = 480;
 //start delay
 let DIREY = 120;
 //Block num
-let BLOCK_x_num = 5;
-let BLOCK_y_num = 4;
+let BLOCK_x_num = 7;
+let BLOCK_y_num = 6;
 
 //video img
 const player = document.getElementById('player');
@@ -17,7 +17,7 @@ navigator.mediaDevices.getUserMedia({video: true, audio: false})
   player.play();
 });
 //face detection
-Promise.all([faceapi.nets.tinyFaceDetector.load("./models"),]);
+Promise.all([faceapi.nets.tinyFaceDetector.load("../models"),]);
 const options = new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.1});
 async function detectFace(bar){
     const result = await faceapi.detectSingleFace(player,options);
@@ -28,9 +28,9 @@ async function detectFace(bar){
 //img asset
 var ASSETS = {
     image: {
-      'ball': './Image/ball.png',
-      'bar' : './Image/bar.png',
-      'bar2': './Image/bar2.png',
+      'ball': '../Image/ball.png',
+      'bar' : '../Image/bar.png',
+      'bar2': '../Image/bar2.png',
     },
   };
 //some scene
@@ -58,15 +58,16 @@ phina.define("MainScene", {
         this.elem.canvas.translate( 640, 0 ).scale( -1, 1 );
         //blocks
         this.block_group = DisplayElement().addChildTo(this);
-        let span = [100,50];
-        let interval =[110,35];
+        let size = [75,15];
+        let span = [(640-(BLOCK_x_num-1)*(size[0]+10))/2,25];
+        let interval =[size[0]+10,size[1]+10];
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
-                var block_shade = Block('bar2',100,100,i).addChildTo(this.block_group);
+                var block_shade = Block('bar2',size[0],size[0],i).addChildTo(this.block_group);
                 block_shade.setPosition(i*interval[0]+span[0]+5,j*interval[1]+span[1]+5);
                 block_shade.setSize(block_shade.x_size,block_shade.y_size);
 
-                var block = Block('bar',100,20 ,i).addChildTo(this.block_group);
+                var block = Block('bar',size[0], size[1] ,i).addChildTo(this.block_group);
                 block.setPosition(i*interval[0]+span[0],j*interval[1]+span[1]);
                 block.setSize(block.x_size,block.y_size);
             }
