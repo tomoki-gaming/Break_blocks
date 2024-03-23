@@ -40,11 +40,6 @@ var myScenes = [
       className: 'MainScene',
       nextLabel: '',
     },
-    {
-      label: 'Title',
-      className: 'TitleScene',
-      nextLabel: '',
-    },
 ];
 //Display class
 phina.define("MainScene", {
@@ -63,21 +58,14 @@ phina.define("MainScene", {
         let interval =[size[0]+10,size[1]+10];
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
-                var block_shade = Block('bar2',size[0],size[0],i).addChildTo(this.block_group);
-                block_shade.setPosition(i*interval[0]+span[0]+5,j*interval[1]+span[1]+5);
-                block_shade.setSize(block_shade.x_size,block_shade.y_size);
-
-                var block = Block('bar',size[0], size[1] ,i).addChildTo(this.block_group);
-                block.setPosition(i*interval[0]+span[0],j*interval[1]+span[1]);
-                block.setSize(block.x_size,block.y_size);
+                pos = [i*interval[0]+span[0],j*interval[1]+span[1]]
+                var block_shade = Block('bar2',size, [pos[0]+5,pos[1]+5]).addChildTo(this.block_group);
+                var block = Block('bar',size, pos).addChildTo(this.block_group);
             }
         }
-        //ball
-        this.ball = Ball('ball',32).addChildTo(this).setPosition(320,200);
-        this.ball.setSize(this.ball.size, this.ball.size);
-        //bar
-        this.bar = Bar('bar',100,20).addChildTo(this).setPosition(320,400);
-        this.bar.setSize(this.bar.x_size, this.bar.y_size);
+        //ball and bar
+        this.ball = Ball('ball',32).addChildTo(this);
+        this.bar = Bar('bar',100).addChildTo(this);
         //success
         this.label = Label({text:'',fill:"red"}).addChildTo(this);
         this.label.setPosition(SCREEN_X/2, SCREEN_Y/2);
@@ -120,11 +108,11 @@ phina.define("MainScene", {
 //bar class
 phina.define('Bar', {
     superClass: 'Sprite',
-    init: function(image ,x_size,y_size) {
+    init: function(image ,size) {
         this.superInit(image);
-        this.x_size = x_size;
-        this.y_size = y_size;
         this.col_flag = 0;
+        this.setPosition(320,400);
+        this.setSize(size, size/5);
     },
 });
 //ball class
@@ -133,8 +121,9 @@ phina.define('Ball', {
     init: function(image, size) {
         this.superInit(image);
         this.spd = [5,5];
-        this.size = size;
         this.time_flag = 0;
+        this.setPosition(320,200)
+        this.setSize(size, size);
     },
     collision:function(shape){
         if (this.hitTestElement(shape) && shape.col_flag==0){
@@ -166,11 +155,10 @@ phina.define('Ball', {
 //block class
 phina.define('Block', {
     superClass: 'Sprite',
-    init: function(image ,x_size,y_size,i) {
+    init: function(image ,size ,pos) {
         this.superInit(image);
-        this.x_size = x_size;
-        this.y_size = y_size;
-        this.index = i;
+        this.setSize(size[0] ,size[1]);
+        this.setPosition(pos[0] ,pos[1]);
     },
 });
 //main function
