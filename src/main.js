@@ -29,6 +29,7 @@ async function detectFace(bar){
 var ASSETS = {
     image: {
       'ball': '../Image/ball.png',
+      'ball2': '../Image/ball2.png',
       'bar' : '../Image/bar.png',
       'bar2': '../Image/bar2.png',
     },
@@ -59,7 +60,7 @@ phina.define("MainScene", {
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
                 pos = [i*interval[0]+span[0],j*interval[1]+span[1]]
-                var block_shade = Block('bar2',size, [pos[0]+5,pos[1]+5]).addChildTo(this.block_group);
+                var block_shade = Block('bar2',size ,[pos[0]+5,pos[1]+5]).addChildTo(this.block_group);
                 var block = Block('bar',size, pos).addChildTo(this.block_group);
             }
         }
@@ -98,6 +99,7 @@ phina.define("MainScene", {
         }
         else if (lest_num == 0 ){
             this.label.text = 'SUCCESS';
+            this.success_count = -1;
         }
         else if(this.ball.y > SCREEN_Y-this.ball.size){
             this.label.text = 'FAILURE';
