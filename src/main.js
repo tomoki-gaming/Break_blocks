@@ -1,14 +1,5 @@
-//magic
+//start phina
 phina.globalize();
-//screen size
-let SCREEN_X = 640;
-let SCREEN_Y = 480;
-//start delay
-let DIREY = 120;
-//Block num
-let BLOCK_x_num = 7;
-let BLOCK_y_num = 6;
-
 //video img
 const player = document.getElementById('player');
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -54,14 +45,11 @@ phina.define("MainScene", {
         this.elem.canvas.translate( 640, 0 ).scale( -1, 1 );
         //blocks
         this.block_group = DisplayElement().addChildTo(this);
-        let size = [75,15];
-        let span = [(640-(BLOCK_x_num-1)*(size[0]+10))/2,25];
-        let interval =[size[0]+10,size[1]+10];
         for (let j = 0; j < BLOCK_y_num; j++) {
             for (let i = 0;i < BLOCK_x_num; i++) {
-                pos = [i*interval[0]+span[0],j*interval[1]+span[1]]
-                var block_shade = Block('bar2',size ,[pos[0]+5,pos[1]+5]).addChildTo(this.block_group);
-                var block = Block('bar',size, pos).addChildTo(this.block_group);
+                pos = [i*VAL[0]+SPAN[0],j*VAL[1]+SPAN[1]]
+                var block = Block('bar',BLOCK_size, pos).addChildTo(this.block_group);
+                var block_shade = Sprite('bar2').addChildTo(block).setPosition(5,5).setSize(BLOCK_size[0],BLOCK_size[1]);
             }
         }
         //ball and bar
@@ -73,7 +61,7 @@ phina.define("MainScene", {
         //success(1) or failure(~-1) or playing(0)
         this.success_count = 0;
     },
-    update: function(){
+    update: function(app){
         this.ball.collision(this.bar);
         lest_num = this.block_collision(this.ball);
         this.elem.canvas.context.drawImage(player, 0, 0, SCREEN_X ,SCREEN_Y);
@@ -81,14 +69,13 @@ phina.define("MainScene", {
         this.success_or_failure(lest_num);
     },
     block_collision:function(ball){
-        for(let i=0 ;i<this.block_group.children.length;i+=2){
-            if (ball.hitTestElement(this.block_group.children[i+1])){
+        this.block_group.children.each((block) => {
+            if (ball.hitTestElement(block)){
                 ball.spd[1] *= -1;
-                this.block_group.children[i].remove();
-                this.block_group.children[i].remove();
+                block.remove();
             }
-        }
-        return this.block_group.children.length/2;
+        });
+        return this.block_group.children.length;
     },
     success_or_failure:function(lest_num){
         if(this.success_count < 0){
@@ -106,62 +93,6 @@ phina.define("MainScene", {
             this.success_count = -1;
         }
     }
-});
-//bar class
-phina.define('Bar', {
-    superClass: 'Sprite',
-    init: function(image ,size) {
-        this.superInit(image);
-        this.col_flag = 0;
-        this.setPosition(320,400);
-        this.setSize(size, size/5);
-    },
-});
-//ball class
-phina.define('Ball', {
-    superClass: 'Sprite',
-    init: function(image, size) {
-        this.superInit(image);
-        this.spd = [5,5];
-        this.time_flag = 0;
-        this.setPosition(320,200)
-        this.setSize(size, size);
-    },
-    collision:function(shape){
-        if (this.hitTestElement(shape) && shape.col_flag==0){
-            this.spd[1]*=-1;
-            shape.col_flag = 30;
-        }
-        else if(shape.col_flag > 0){
-            shape.col_flag-=1;
-        }
-    },
-    update: function() {
-        //delay to start
-        if(this.time_flag > DIREY){
-            this.x += this.spd[0];
-            this.y += this.spd[1];
-        }
-        else{
-            this.time_flag+=1;
-        }
-
-        if (this.x >= SCREEN_X -this.size/2 || this.x <= 0){
-            this.spd[0] *= -1;
-        }
-        if(this.y >= SCREEN_Y -this.size/2 || this.y <= 0){
-            this.spd[1] *= -1;
-        }
-    } 
-});
-//block class
-phina.define('Block', {
-    superClass: 'Sprite',
-    init: function(image ,size ,pos) {
-        this.superInit(image);
-        this.setSize(size[0] ,size[1]);
-        this.setPosition(pos[0] ,pos[1]);
-    },
 });
 //main function
 phina.main(function() {
