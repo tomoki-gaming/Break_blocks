@@ -1,4 +1,4 @@
-//bar class
+//バー(プレイヤー)クラス
 phina.define('Bar', {
     superClass: 'Sprite',
     init: function(image ,size) {
@@ -8,7 +8,7 @@ phina.define('Bar', {
         this.setSize(size, size/5);
     },
 });
-//block class
+//ブロッククラス
 phina.define('Block', {
     superClass: 'Sprite',
     init: function(image ,size ,pos) {
@@ -19,7 +19,7 @@ phina.define('Block', {
         this.setPosition(this.pos[0] ,this.pos[1]);
     },
 });
-//ball class
+//ボールクラス
 phina.define('Ball', {
     superClass: 'Sprite',
     init: function(image, size) {
@@ -31,6 +31,7 @@ phina.define('Ball', {
         this.setSize(this.size, this.size);
     },
     collision:function(shape){
+        //ブロックとの衝突判定
         if (this.hitTestElement(shape) && shape.col_flag==0){
             this.spd[1]*=-1;
             shape.col_flag = 30;
@@ -40,7 +41,7 @@ phina.define('Ball', {
         }
     },
     update: function() {
-        //delay to start
+        //遅延してゲームスタート
         if(this.time_flag > DIREY){
             this.x += this.spd[0];
             this.y += this.spd[1];
@@ -48,7 +49,7 @@ phina.define('Ball', {
         else{
             this.time_flag+=1;
         }
-
+        //壁反射
         if (this.x >= SCREEN_X -this.size/2 || this.x <= 0){
             this.spd[0] *= -1;
         }
