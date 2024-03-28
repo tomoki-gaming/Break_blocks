@@ -1,3 +1,33 @@
+phina.globalize();
+//画像アセット
+var ASSETS = {
+    image: {
+      'ball': '../Image/ball.png',
+      'ball2': '../Image/ball2.png',
+      'bar' : '../Image/bar.png',
+      'bar2': '../Image/bar2.png',
+    },
+  };
+//シーン管理
+var myScenes = [
+    {
+      label: 'Main',
+      className: 'MainScene',
+      nextLabel: '',
+    },
+];
+//画面サイズ
+let SCREEN_X = 640;
+let SCREEN_Y = 480;
+//遅延定数
+let DIREY = 120;
+//ブロック定数
+let BLOCK_x_num = 7;
+let BLOCK_y_num = 6;
+let BLOCK_size = [75,15];
+let SPAN = [(640-(BLOCK_x_num-1)*(BLOCK_size[0]+10))/2,25];
+let VAL =[BLOCK_size[0]+10,BLOCK_size[1]+10];
+
 //ビデオキャプチャ
 const player = document.getElementById('player');
 navigator.mediaDevices.getUserMedia({video: true, audio: false})
@@ -6,7 +36,7 @@ navigator.mediaDevices.getUserMedia({video: true, audio: false})
   player.play();
 });
 //顔認識
-Promise.all([faceapi.nets.tinyFaceDetector.load("../models"),]);
+Promise.all([faceapi.nets.tinyFaceDetector.load("./models"),]);
 const options = new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.1});
 async function detectFace(bar){
     const result = await faceapi.detectSingleFace(player,options);
@@ -83,4 +113,65 @@ phina.define("MainScene", {
 phina.main(function() {
     var app = GameApp({startLabel: 'main', width: SCREEN_X, height: SCREEN_Y, assets: ASSETS});
     app.run();
+});
+
+//バー(プレイヤー)クラス
+phina.define('Bar', {
+    superClass: 'Sprite',
+    init: function(image ,size) {
+        this.superInit(image);
+        this.col_flag = 0;
+        this.setPosition(320,400);
+        this.setSize(size, size/5);
+    },
+});
+//ブロッククラス
+phina.define('Block', {
+    superClass: 'Sprite',
+    init: function(image ,size ,pos) {
+        this.superInit(image);
+        this.size = size;
+        this.pos = pos;
+        this.setSize(this.size[0] ,this.size[1]);
+        this.setPosition(this.pos[0] ,this.pos[1]);
+    },
+});
+//ボールクラス
+phina.define('Ball', {
+    superClass: 'Sprite',
+    init: function(image, size) {
+        this.superInit(image);
+        this.spd = [5,5];
+        this.size = size;
+        this.time_flag = 0;
+        this.setPosition(320,200)
+        this.setSize(this.size, this.size);
+    },
+    collision:function(shape){
+        //ブロックとの衝突判定
+        if (this.hitTestElement(shape) && shape.col_flag==0){
+            this.spd[1]*=-1;
+            shape.col_flag = 30;
+        }
+        else if(shape.col_flag > 0){
+            shape.col_flag-=1;
+        }
+    },
+    update: function() {
+        //遅延してゲームスタート
+        if(this.time_flag > DIREY){
+            this.x += this.spd[0];
+            this.y += this.spd[1];
+        }
+        else{
+            this.time_flag+=1;
+        }
+        //壁反射
+        if (this.x >= SCREEN_X -this.size/2 || this.x <= 0){
+            this.spd[0] *= -1;
+        }
+        if(this.y >= SCREEN_Y -this.size/2 || this.y <= 0){
+            this.spd[1] *= -1;
+        }
+    } 
 });
