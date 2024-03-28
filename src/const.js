@@ -2,10 +2,10 @@ phina.globalize();
 //画像アセット
 var ASSETS = {
     image: {
-      'ball': '/Image/ball.png',
-      'ball2': '/Image/ball2.png',
-      'bar' : '/Image/bar.png',
-      'bar2': '/Image/bar2.png',
+      'ball': 'Image/ball.png',
+      'ball2': 'Image/ball2.png',
+      'bar' : 'Image/bar.png',
+      'bar2': 'Image/bar2.png',
     },
   };
 //シーン管理
