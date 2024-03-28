@@ -36,7 +36,7 @@ navigator.mediaDevices.getUserMedia({video: true, audio: false})
   player.play();
 });
 //顔認識
-Promise.all([faceapi.nets.tinyFaceDetector.load("./models"),]);
+Promise.all([faceapi.nets.tinyFaceDetector.load("../models"),]);
 const options = new faceapi.TinyFaceDetectorOptions({inputSize:320,scoreThreshold:0.1});
 async function detectFace(bar){
     const result = await faceapi.detectSingleFace(player,options);
